@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tripmanager/pages/history.dart';
 import '../route/routes_names.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -88,7 +89,11 @@ class SettingsPage extends StatelessWidget {
                       icon: Icons.history,
                       title: 'History',
                       onTap: () {
-                        // implement connected accounts functionality
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const History(),
+                          ),
+                        );
                       },
                     ),
                   ),
