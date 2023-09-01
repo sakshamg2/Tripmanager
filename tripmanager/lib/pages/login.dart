@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tripmanager/model/user_response.dart';
 import 'package:tripmanager/shared_preferences.dart';
 import '../route/routes_names.dart';
 import 'package:http/http.dart' as http;
@@ -11,16 +11,16 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
+
   final _passwordController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
 
-  late String token;
-  late int id;
   _handleTap() async {
     if (_formKey.currentState!.validate()) {
       var headers = {'Content-Type': 'application/json'};
@@ -36,28 +36,19 @@ class _LoginPageState extends State<LoginPage> {
       dynamic jsonResponse = jsonDecode(response.body);
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        // Decode the response JSON
-
-        // print(jsonResponse);
-        // print(jsonResponse['token']);
-        token = jsonResponse['token']['access'];
-        id = jsonResponse['id'];
-        print(token);
-        setToken(token);
-        setUserId(id);
+        LoginResponse loginResponse = LoginResponse.fromJson(jsonResponse);
+        setToken(loginResponse.token.access);
+        setUserId(loginResponse.user.id);
 
         Navigator.pushNamed(context, RoutesName.homeRoute);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              jsonResponse['msg'],
-            ),
+            content: Text(loginResponse.msg),
             backgroundColor: Colors.green,
           ),
         );
       } else {
         print(response.reasonPhrase);
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -114,6 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                       if (value!.isEmpty) {
                         return "Email is empty";
                       }
+                      return null;
                     },
                     decoration: const InputDecoration(
                       hintText: 'Email',
@@ -137,6 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                       if (value!.isEmpty) {
                         return "Password can't be empty";
                       }
+                      return null;
                     },
                     decoration: const InputDecoration(
                       hintText: 'Password',
